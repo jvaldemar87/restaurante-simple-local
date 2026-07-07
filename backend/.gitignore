@@ -1,0 +1,10 @@
+target/
+*.db
+*.db-wal
+*.db-shm
+uploads/*
+!uploads/.gitkeep
+.DS_Store
+*.log
+.idea/
+*.iml
