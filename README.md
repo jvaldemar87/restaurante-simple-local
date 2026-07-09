@@ -89,11 +89,18 @@ El frontend corre en **http://localhost:3000** con proxy al backend en :8080.
 
 ## Usuarios por defecto
 
+Los usuarios se configuran en el archivo `backend/src/main/resources/usuarios` (sin extension).
+Cada linea tiene el formato `USUARIO,CONTRASENA,ROL`. Al iniciar el servidor se cargan automaticamente.
+
+**Contenido por defecto:**
+
 | Usuario   | Contrasena   | Rol           |
 |-----------|-------------|---------------|
 | `admin`   | `admin123`   | Administrador |
 | `mesero`  | `mesero123`  | Mesero        |
 | `cajero`  | `cajero123`  | Cajero        |
+
+Para cambiar una contrasena, edita el archivo y reinicia el servidor.
 
 ## Estructura del proyecto
 
