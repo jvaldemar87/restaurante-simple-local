@@ -1,16 +1,25 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { mesas } from '../../api/client'
+import { mesas, configuracion } from '../../api/client'
 import Header from '../../components/Header'
 
 export default function GestionMesas() {
   const [lista, setLista] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [num, setNum] = useState('')
+  const [minutos, setMinutos] = useState(30)
+  const [editing, setEditing] = useState(false)
+  const [intervaloAlerta, setIntervaloAlerta] = useState(5)
+  const [editingAlerta, setEditingAlerta] = useState(false)
   const navigate = useNavigate()
 
   const load = () => mesas.list().then(setLista)
-  useEffect(() => { load() }, [])
+
+  useEffect(() => {
+    load()
+    configuracion.getTiempoTolerancia().then(d => setMinutos(d.minutos)).catch(() => {})
+    configuracion.getAlertaIntervalo().then(d => setIntervaloAlerta(d.minutos)).catch(() => {})
+  }, [])
 
   const addMesa = async () => {
     if (!num) return
@@ -25,6 +34,22 @@ export default function GestionMesas() {
     if (!window.confirm('¿Eliminar mesa?')) return
     await mesas.delete(id)
     load()
+  }
+
+  const toggleEdit = async () => {
+    if (editing) {
+      if (!minutos || minutos < 1) return
+      await configuracion.updateTiempoTolerancia(minutos)
+    }
+    setEditing(!editing)
+  }
+
+  const toggleEditAlerta = async () => {
+    if (editingAlerta) {
+      if (intervaloAlerta == null || intervaloAlerta < 0) return
+      await configuracion.updateAlertaIntervalo(intervaloAlerta)
+    }
+    setEditingAlerta(!editingAlerta)
   }
 
   return (
@@ -64,6 +89,44 @@ export default function GestionMesas() {
         ) : (
           <button style={styles.addBtn} onClick={() => setShowForm(true)}>+</button>
         )}
+
+        <div style={styles.configCard}>
+          <h3 style={styles.configTitle}>Configuración de comandas</h3>
+
+          <div style={styles.configLabel}>Tiempo de tolerancia</div>
+          <div style={styles.configRow}>
+            <label style={styles.switchLabel}>
+              <input type="checkbox" checked={editing} onChange={toggleEdit}
+                style={styles.checkbox} />
+              <span style={styles.switchText}>{editing ? 'Editando' : 'Bloqueado'}</span>
+            </label>
+            <input type="number" value={minutos} disabled={!editing}
+              onChange={e => setMinutos(Number(e.target.value))}
+              min={1} style={{
+                ...styles.timeInput,
+                opacity: editing ? 1 : 0.5,
+                background: editing ? '#fff' : '#f0f0f0',
+              }} />
+            <span style={styles.unit}>minutos</span>
+          </div>
+
+          <div style={{ ...styles.configLabel, marginTop: 16 }}>Intervalo de alerta</div>
+          <div style={styles.configRow}>
+            <label style={styles.switchLabel}>
+              <input type="checkbox" checked={editingAlerta} onChange={toggleEditAlerta}
+                style={styles.checkbox} />
+              <span style={styles.switchText}>{editingAlerta ? 'Editando' : 'Bloqueado'}</span>
+            </label>
+            <input type="number" value={intervaloAlerta} disabled={!editingAlerta}
+              onChange={e => setIntervaloAlerta(Number(e.target.value))}
+              min={0} style={{
+                ...styles.timeInput,
+                opacity: editingAlerta ? 1 : 0.5,
+                background: editingAlerta ? '#fff' : '#f0f0f0',
+              }} />
+            <span style={styles.unit}>minutos</span>
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -116,5 +179,35 @@ const styles = {
     width: '100%', padding: 14, borderRadius: 10, border: 'none',
     background: '#d32f2f', color: '#fff', fontSize: 28, fontWeight: 700,
     cursor: 'pointer', marginTop: 12,
+  },
+  configCard: {
+    background: '#fff', borderRadius: 10, padding: 20, marginTop: 20,
+    boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+  },
+  configTitle: {
+    fontSize: 16, fontWeight: 600, color: '#333', marginBottom: 14,
+  },
+  configLabel: {
+    fontSize: 13, fontWeight: 500, color: '#666', marginBottom: 8,
+  },
+  configRow: {
+    display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+  },
+  switchLabel: {
+    display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
+    userSelect: 'none',
+  },
+  checkbox: {
+    width: 18, height: 18, accentColor: '#d32f2f', cursor: 'pointer',
+  },
+  switchText: {
+    fontSize: 13, color: '#666', fontWeight: 500,
+  },
+  timeInput: {
+    width: 72, padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd',
+    fontSize: 15, outline: 'none', textAlign: 'center',
+  },
+  unit: {
+    fontSize: 14, color: '#888',
   },
 }

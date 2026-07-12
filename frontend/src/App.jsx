@@ -10,6 +10,7 @@ import ResumenOrden from './pages/mesero/ResumenOrden'
 import ListaMesasCajero from './pages/cajero/ListaMesas'
 import ComensalesMesaCajero from './pages/cajero/ComensalesMesa'
 import DetalleComensalCajero from './pages/cajero/DetalleComensal'
+import CocinaView from './pages/cocinero/CocinaView'
 import Dashboard from './pages/admin/Dashboard'
 import GestionMesas from './pages/admin/GestionMesas'
 import GestionMenu from './pages/admin/GestionMenu'
@@ -44,6 +45,8 @@ export default function App() {
         <Route path="/cajero/mesa/:mesaId" element={<ProtectedRoute roles={['CAJERO','ADMIN']}><ComensalesMesaCajero /></ProtectedRoute>} />
         <Route path="/cajero/mesa/:mesaId/comensal/:comensalId" element={<ProtectedRoute roles={['CAJERO','ADMIN']}><DetalleComensalCajero /></ProtectedRoute>} />
 
+        <Route path="/cocinero" element={<ProtectedRoute roles={['COCINERO','ADMIN']}><CocinaView /></ProtectedRoute>} />
+
         <Route path="/admin" element={<ProtectedRoute roles={['ADMIN']}><Dashboard /></ProtectedRoute>} />
         <Route path="/admin/mesas" element={<ProtectedRoute roles={['ADMIN']}><GestionMesas /></ProtectedRoute>} />
         <Route path="/admin/mesas/mesa/:mesaId" element={<ProtectedRoute roles={['ADMIN']}><ComensalesMesa /></ProtectedRoute>} />
@@ -54,6 +57,7 @@ export default function App() {
         <Route path="/admin/insumos" element={<ProtectedRoute roles={['ADMIN']}><GestionInsumos /></ProtectedRoute>} />
         <Route path="/admin/pagos" element={<ProtectedRoute roles={['ADMIN']}><GestionPagos /></ProtectedRoute>} />
         <Route path="/admin/reportes" element={<ProtectedRoute roles={['ADMIN']}><ReporteVentas /></ProtectedRoute>} />
+        <Route path="/admin/cocina" element={<ProtectedRoute roles={['ADMIN']}><CocinaView /></ProtectedRoute>} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

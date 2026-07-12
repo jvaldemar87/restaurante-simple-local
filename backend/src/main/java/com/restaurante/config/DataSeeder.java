@@ -57,7 +57,7 @@ public class DataSeeder implements CommandLineRunner {
                 String password = parts[1].trim();
                 String rol = parts[2].trim().toUpperCase();
 
-                if (!rol.equals("ADMIN") && !rol.equals("MESERO") && !rol.equals("CAJERO")) {
+                if (!rol.equals("ADMIN") && !rol.equals("MESERO") && !rol.equals("CAJERO") && !rol.equals("COCINERO")) {
                     System.out.println(">>> [DataSeeder] Linea ignorada (rol invalido): " + line);
                     continue;
                 }

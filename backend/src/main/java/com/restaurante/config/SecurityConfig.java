@@ -79,6 +79,14 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.PUT, "/api/pedidos/**").hasAnyRole("ADMIN", "MESERO")
                 .antMatchers(HttpMethod.DELETE, "/api/pedidos/**").hasAnyRole("ADMIN", "MESERO")
 
+                // Cocina: COCINERO y ADMIN
+                .antMatchers("/api/cocina/**").hasAnyRole("COCINERO", "ADMIN")
+
+                // Configuración: GET para COCINERO y ADMIN, escritura solo ADMIN
+                .antMatchers(HttpMethod.GET, "/api/configuracion/**").hasAnyRole("COCINERO", "ADMIN")
+                .antMatchers(HttpMethod.PUT, "/api/configuracion/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, "/api/configuracion/**").hasRole("ADMIN")
+
                 // Any other /api/** requires authentication
                 .antMatchers("/api/**").authenticated()
 

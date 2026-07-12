@@ -3,6 +3,7 @@ import Header from '../../components/Header'
 
 const modules = [
   { label: 'Mesas', path: '/admin/mesas', color: '#d32f2f' },
+  { label: 'Cocina', path: '/admin/cocina', color: '#e64a19' },
   { label: 'Insumos', path: '/admin/insumos', color: '#1976d2' },
   { label: 'Pagos', path: '/admin/pagos', color: '#388e3c' },
   { label: 'Reportes', path: '/admin/reportes', color: '#f57c00' },

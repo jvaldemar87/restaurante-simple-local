@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -121,6 +122,8 @@ public class PedidoService {
                 .orElseThrow(() -> new RuntimeException("Pedido no encontrado: " + pedidoId));
 
         pedido.setEstado("COMIENDO");
+        pedido.setFechaComanda(LocalDateTime.now());
+        pedido.setEntregado(false);
         recalcularTotal(pedido);
 
         return toDTO(pedidoRepository.save(pedido));
@@ -187,6 +190,8 @@ public class PedidoService {
         dto.setFecha(p.getFecha().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
         dto.setEstado(p.getEstado());
         dto.setTotal(p.getTotal());
+        dto.setFechaComanda(p.getFechaComanda() != null ? p.getFechaComanda().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : null);
+        dto.setEntregado(p.getEntregado());
         dto.setDetalles(p.getDetalles().stream().map(this::toDetalleDTO).collect(Collectors.toList()));
         return dto;
     }

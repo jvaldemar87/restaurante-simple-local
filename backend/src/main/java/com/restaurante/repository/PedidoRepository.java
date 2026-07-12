@@ -30,4 +30,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     @Query("SELECT DISTINCT p FROM Pedido p JOIN FETCH p.mesa JOIN FETCH p.detalles WHERE p.estado = 'CERRADO' AND p.fecha >= :inicio AND p.fecha <= :fin ORDER BY p.fecha ASC")
     List<Pedido> findCerradosEntreFechas(@Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
+
+    @Query("SELECT DISTINCT p FROM Pedido p JOIN FETCH p.detalles d JOIN FETCH d.producto JOIN FETCH p.mesa WHERE p.estado = 'COMIENDO' AND p.entregado = false ORDER BY p.fechaComanda ASC")
+    List<Pedido> findByEstadoAndEntregadoFalseOrderByFechaComandaAsc();
 }

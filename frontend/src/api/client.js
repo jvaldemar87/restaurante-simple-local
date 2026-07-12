@@ -149,6 +149,18 @@ export const categoriasPago = {
   list: () => api.get('/categorias-pago').then(r => r.data),
 }
 
+export const cocina = {
+  comandas: () => api.get('/cocina/comandas').then(r => r.data),
+  entregar: (pedidoId) => api.put(`/cocina/comandas/${pedidoId}/entregar`).then(r => r.data),
+}
+
+export const configuracion = {
+  getTiempoTolerancia: () => api.get('/configuracion/tiempo-tolerancia').then(r => r.data),
+  updateTiempoTolerancia: (minutos) => api.put('/configuracion/tiempo-tolerancia', { minutos }).then(r => r.data),
+  getAlertaIntervalo: () => api.get('/configuracion/alerta-intervalo').then(r => r.data),
+  updateAlertaIntervalo: (minutos) => api.put('/configuracion/alerta-intervalo', { minutos }).then(r => r.data),
+}
+
 export const reportes = {
   ticket: (mesaId) => api.get(`/reportes/ticket/${mesaId}`, { responseType: 'blob' }).then(r => r.data),
   comanda: (mesaId) => api.get(`/reportes/comanda/${mesaId}`, { responseType: 'blob' }).then(r => r.data),

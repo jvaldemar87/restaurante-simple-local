@@ -18,6 +18,10 @@ public class PedidoDTO {
 
     private Double total;
 
+    private String fechaComanda;
+
+    private Boolean entregado;
+
     private List<DetallePedidoDTO> detalles;
 
     public PedidoDTO() {}
@@ -34,6 +38,10 @@ public class PedidoDTO {
     public void setEstado(String estado) { this.estado = estado; }
     public Double getTotal() { return total; }
     public void setTotal(Double total) { this.total = total; }
+    public String getFechaComanda() { return fechaComanda; }
+    public void setFechaComanda(String fechaComanda) { this.fechaComanda = fechaComanda; }
+    public Boolean getEntregado() { return entregado; }
+    public void setEntregado(Boolean entregado) { this.entregado = entregado; }
     public List<DetallePedidoDTO> getDetalles() { return detalles; }
     public void setDetalles(List<DetallePedidoDTO> detalles) { this.detalles = detalles; }
 }

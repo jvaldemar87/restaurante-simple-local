@@ -33,6 +33,12 @@ public class Pedido {
     @Column(nullable = false)
     private Double total = 0.0;
 
+    @Column(name = "fecha_comanda")
+    private LocalDateTime fechaComanda;
+
+    @Column(nullable = false)
+    private Boolean entregado = false;
+
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<DetallePedido> detalles = new ArrayList<>();
 
@@ -50,6 +56,10 @@ public class Pedido {
     public void setEstado(String estado) { this.estado = estado; }
     public Double getTotal() { return total; }
     public void setTotal(Double total) { this.total = total; }
+    public LocalDateTime getFechaComanda() { return fechaComanda; }
+    public void setFechaComanda(LocalDateTime fechaComanda) { this.fechaComanda = fechaComanda; }
+    public Boolean getEntregado() { return entregado; }
+    public void setEntregado(Boolean entregado) { this.entregado = entregado; }
     public List<DetallePedido> getDetalles() { return detalles; }
     public void setDetalles(List<DetallePedido> detalles) { this.detalles = detalles; }
 }

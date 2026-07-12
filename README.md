@@ -6,7 +6,7 @@
 [![SQLite](https://img.shields.io/badge/SQLite-3-lightgrey)](https://www.sqlite.org/)
 [![License](https://img.shields.io/badge/licencia-Interna-orange)]()
 
-App de gestion integral para restaurantes pequeños. Funciona 100% offline con roles de Mesero, Cajero y Administrador. Backend Java Spring Boot + SQLite, frontend React. Incluye toma de pedidos, inventario, pagos y reportes PDF.
+App de gestion integral para restaurantes pequeños. Funciona 100% offline con roles de Mesero, Cajero, Cocinero y Administrador. Backend Java Spring Boot + SQLite, frontend React. Incluye toma de pedidos, inventario, pagos, vista de cocina con comandas en tiempo real y reportes PDF.
 
 ## Caracteristicas
 
@@ -22,12 +22,21 @@ App de gestion integral para restaurantes pequeños. Funciona 100% offline con r
 - Impresion de ticket
 - Cierre de cuenta de mesa
 
+### Cocinero
+- Visualizacion de comandas como tarjetas POST-IT
+- Agrupacion de productos identicos por comanda
+- Sistema de urgencia con alerta sonora (beep triple)
+- Ordenamiento por tiempo de espera (urgentes primero)
+- Entrega de comandas con un toque (boton X)
+- Tiempo de tolerancia y alerta configurables por admin
+
 ### Administrador
 - CRUD completo de mesas, productos y categorias
 - Control de inventario (insumos)
 - Gestion de pagos (sueldos, renta, servicios)
 - Reportes PDF (ventas, insumos, pagos)
 - Evidencia fotografica de pagos
+- Configuracion de tiempo de tolerancia e intervalo de alerta para cocina
 
 ## Stack tecnologico
 
@@ -99,6 +108,7 @@ Cada linea tiene el formato `USUARIO,CONTRASENA,ROL`. Al iniciar el servidor se 
 | `admin`   | `admin123`   | Administrador |
 | `mesero`  | `mesero123`  | Mesero        |
 | `cajero`  | `cajero123`  | Cajero        |
+| `cocinero`| `cocinero123`| Cocinero      |
 
 Para cambiar una contrasena, edita el archivo y reinicia el servidor.
 
@@ -110,7 +120,7 @@ RESTAURANTE/
 │   ├── src/main/java/com/restaurante/
 │   │   ├── config/             # CORS, SQLite Dialect, Security
 │   │   ├── security/           # JWT util + filtro
-│   │   ├── model/              # Entidades JPA (10 entidades)
+│   │   ├── model/              # Entidades JPA (12 entidades)
 │   │   ├── repository/         # Repositorios Spring Data
 │   │   ├── dto/                # Objetos de transferencia
 │   │   ├── service/            # Logica de negocio
@@ -122,7 +132,7 @@ RESTAURANTE/
 │   │   ├── api/                # Cliente Axios + endpoints
 │   │   ├── context/            # AuthContext
 │   │   ├── components/         # Header, ProtectedRoute, etc.
-│   │   ├── pages/              # Login, Mesero, Cajero, Admin
+│   │   ├── pages/              # Login, Mesero, Cajero, Cocinero, Admin
 │   │   └── styles/             # CSS global
 │   ├── package.json
 │   └── vite.config.js
@@ -143,6 +153,10 @@ RESTAURANTE/
 | POST                      | `/api/pedidos/{id}/detalles`          | Agregar producto al pedido   |
 | PUT                       | `/api/pedidos/{id}/cerrar`            | Cerrar pedido                |
 | POST                      | `/api/pedidos/cerrar-mesa/{mesaId}`   | Cerrar cuenta de mesa        |
+| GET                       | `/api/cocina/comandas`                | Listar comandas pendientes   |
+| PUT                       | `/api/cocina/comandas/{id}/entregar`  | Entregar comanda             |
+| GET/PUT                   | `/api/configuracion/tiempo-tolerancia`| Tolerancia de urgencia (min) |
+| GET/PUT                   | `/api/configuracion/alerta-intervalo` | Intervalo de alerta (min)    |
 | GET                       | `/api/reportes/ticket/{mesaId}`       | Ticket PDF                   |
 | GET                       | `/api/reportes/ventas`                | Reporte de ventas PDF        |
 
