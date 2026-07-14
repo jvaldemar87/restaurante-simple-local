@@ -17,6 +17,7 @@ import GestionMenu from './pages/admin/GestionMenu'
 import GestionInsumos from './pages/admin/GestionInsumos'
 import GestionPagos from './pages/admin/GestionPagos'
 import ReporteVentas from './pages/admin/ReporteVentas'
+import Respaldos from './pages/admin/Respaldos'
 
 function HomeRedirect() {
   const { isAuthenticated, user, loading } = useAuth()
@@ -57,6 +58,7 @@ export default function App() {
         <Route path="/admin/insumos" element={<ProtectedRoute roles={['ADMIN']}><GestionInsumos /></ProtectedRoute>} />
         <Route path="/admin/pagos" element={<ProtectedRoute roles={['ADMIN']}><GestionPagos /></ProtectedRoute>} />
         <Route path="/admin/reportes" element={<ProtectedRoute roles={['ADMIN']}><ReporteVentas /></ProtectedRoute>} />
+        <Route path="/admin/respaldos" element={<ProtectedRoute roles={['ADMIN']}><Respaldos /></ProtectedRoute>} />
         <Route path="/admin/cocina" element={<ProtectedRoute roles={['ADMIN']}><CocinaView /></ProtectedRoute>} />
 
         <Route path="*" element={<Navigate to="/" replace />} />

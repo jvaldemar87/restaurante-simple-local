@@ -88,6 +88,9 @@ public class SecurityConfig {
                 // Cocina: COCINERO y ADMIN
                 .antMatchers("/api/cocina/**").hasAnyRole("COCINERO", "ADMIN")
 
+                // Respaldo: solo ADMIN
+                .antMatchers("/api/respaldo/**").hasRole("ADMIN")
+
                 // Configuración: GET para COCINERO y ADMIN, escritura solo ADMIN
                 .antMatchers(HttpMethod.GET, "/api/configuracion/**").hasAnyRole("COCINERO", "ADMIN")
                 .antMatchers(HttpMethod.PUT, "/api/configuracion/**").hasRole("ADMIN")

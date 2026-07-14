@@ -154,6 +154,44 @@ export const cocina = {
   entregar: (pedidoId) => api.put(`/cocina/comandas/${pedidoId}/entregar`).then(r => r.data),
 }
 
+export const respaldo = {
+  exportar: async (incluirImagenes = false) => {
+    const token = localStorage.getItem('token')
+    const res = await fetch(`/api/respaldo/exportar?incluirImagenes=${incluirImagenes}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (!res.ok) {
+      const text = await res.text()
+      let msg = `Error ${res.status}`
+      try { const json = JSON.parse(text); msg = json.error || msg } catch {}
+      throw new Error(msg)
+    }
+    const blob = await res.blob()
+    const disposition = res.headers.get('content-disposition')
+    let filename = 'respaldo.zip'
+    if (disposition) {
+      const match = disposition.match(/filename="?(.+?)"?$/i)
+      if (match) filename = match[1]
+    }
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    setTimeout(() => URL.revokeObjectURL(url), 60000)
+  },
+  importar: (file) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    return api.post('/respaldo/importar', fd, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 30000
+    }).then(r => r.data)
+  },
+}
+
 export const configuracion = {
   getTiempoTolerancia: () => api.get('/configuracion/tiempo-tolerancia').then(r => r.data),
   updateTiempoTolerancia: (minutos) => api.put('/configuracion/tiempo-tolerancia', { minutos }).then(r => r.data),

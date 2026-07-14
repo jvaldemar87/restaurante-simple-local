@@ -7,6 +7,7 @@ const modules = [
   { label: 'Insumos', path: '/admin/insumos', color: '#1976d2' },
   { label: 'Pagos', path: '/admin/pagos', color: '#388e3c' },
   { label: 'Reportes', path: '/admin/reportes', color: '#f57c00' },
+  { label: 'Respaldos', path: '/admin/respaldos', color: '#7b1fa2' },
 ]
 
 export default function Dashboard() {
