@@ -8,6 +8,7 @@ import com.restaurante.repository.PagoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
@@ -72,6 +73,9 @@ public class PagoService {
         pago.setCategoriaPago(categoria);
         pago.setObservaciones(dto.getObservaciones());
         pago.setEvidenciaImagen(dto.getEvidenciaImagen());
+        if (dto.getFecha() != null && !dto.getFecha().isBlank()) {
+            pago.setFecha(LocalDate.parse(dto.getFecha()).atStartOfDay());
+        }
 
         return toDTO(pagoRepository.save(pago));
     }
@@ -85,6 +89,9 @@ public class PagoService {
         pago.setMonto(dto.getMonto());
         if (dto.getObservaciones() != null) pago.setObservaciones(dto.getObservaciones());
         pago.setEvidenciaImagen(dto.getEvidenciaImagen());
+        if (dto.getFecha() != null && !dto.getFecha().isBlank()) {
+            pago.setFecha(LocalDate.parse(dto.getFecha()).atStartOfDay());
+        }
 
         if (dto.getCategoriaPagoId() != null) {
             CategoriaPago categoria = categoriaPagoRepository.findById(dto.getCategoriaPagoId())

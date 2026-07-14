@@ -1,5 +1,7 @@
 package com.restaurante.dto;
 
+import com.restaurante.validation.NotFuture;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -14,6 +16,7 @@ public class PagoDTO {
     @NotNull @Positive
     private Double monto;
 
+    @NotFuture
     private String fecha;
 
     @NotNull

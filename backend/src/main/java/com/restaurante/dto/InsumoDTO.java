@@ -1,5 +1,7 @@
 package com.restaurante.dto;
 
+import com.restaurante.validation.NotFuture;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -16,6 +18,7 @@ public class InsumoDTO {
 
     private String unidad = "pza";
 
+    @NotFuture
     private String fechaIngreso;
 
     @NotNull @Positive

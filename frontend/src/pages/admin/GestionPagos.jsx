@@ -5,7 +5,8 @@ import Header from '../../components/Header'
 
 const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 const anioActual = new Date().getFullYear()
-const emptyForm = { concepto: '', monto: '', observaciones: '' }
+const today = () => new Date().toISOString().split('T')[0]
+const emptyForm = { concepto: '', monto: '', fecha: today(), observaciones: '' }
 
 export default function GestionPagos() {
   const navigate = useNavigate()
@@ -56,6 +57,7 @@ export default function GestionPagos() {
     const payload = {
       concepto: form.concepto,
       monto: Number(form.monto),
+      fecha: form.fecha,
       observaciones: form.observaciones || null,
       categoriaPagoId: selectedCat,
       evidenciaImagen
@@ -73,6 +75,7 @@ export default function GestionPagos() {
     setForm({
       concepto: item.concepto,
       monto: String(item.monto),
+      fecha: item.fecha || today(),
       observaciones: item.observaciones || ''
     })
     setEditingId(item.id)
@@ -189,6 +192,8 @@ export default function GestionPagos() {
             onChange={e => setForm({ ...form, concepto: e.target.value })} />
           <input style={styles.input} placeholder="Monto" type="number" value={form.monto}
             onChange={e => setForm({ ...form, monto: e.target.value })} />
+          <input style={styles.input} type="date" value={form.fecha} max={today()}
+            onChange={e => setForm({ ...form, fecha: e.target.value })} />
           <input style={styles.input} placeholder="Observaciones (opcional)" value={form.observaciones}
             onChange={e => setForm({ ...form, observaciones: e.target.value })} />
           <input style={styles.input} type="file" accept="image/*" onChange={handleFileChange} />
