@@ -25,6 +25,7 @@ export default function GestionPagos() {
   const [reportAnio, setReportAnio] = useState('')
   const [reportCat, setReportCat] = useState('')
   const [viewItem, setViewItem] = useState(null)
+  const [pageError, setPageError] = useState(null)
 
   const loadCats = () => categoriasPago.list().then(data => {
     setCats(data)
@@ -32,6 +33,8 @@ export default function GestionPagos() {
   })
 
   useEffect(() => { loadCats() }, [])
+
+  useEffect(() => { setPageError(null) }, [form])
 
   const loadItems = () => {
     if (selectedCat) pagos.list(selectedCat, listMes, listAnio).then(setItems)
@@ -47,10 +50,12 @@ export default function GestionPagos() {
     setPreview(null)
     setExistingImage(null)
     setRemoveImage(false)
+    setPageError(null)
   }
 
   const saveItem = async () => {
     if (!form.concepto || !form.monto || !selectedCat) return
+    setPageError(null)
     let evidenciaImagen = existingImage
     if (removeImage) evidenciaImagen = null
     else if (file) evidenciaImagen = await pagos.uploadImage(file)
@@ -62,13 +67,23 @@ export default function GestionPagos() {
       categoriaPagoId: selectedCat,
       evidenciaImagen
     }
-    if (editingId) {
-      await pagos.update(editingId, payload)
-    } else {
-      await pagos.create(payload)
+    try {
+      if (editingId) {
+        await pagos.update(editingId, payload)
+      } else {
+        await pagos.create(payload)
+      }
+      resetForm()
+      loadItems()
+    } catch (e) {
+      const data = e.response?.data
+      if (data && typeof data === 'object') {
+        const messages = Object.values(data).join('. ')
+        setPageError(messages)
+      } else {
+        setPageError(e.message || 'Error al guardar el pago')
+      }
     }
-    resetForm()
-    loadItems()
   }
 
   const editItem = (item) => {
@@ -87,7 +102,10 @@ export default function GestionPagos() {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
   }
 
-  const cancelEdit = () => resetForm()
+  const cancelEdit = () => {
+    resetForm()
+    setPageError(null)
+  }
 
   const deleteItem = async (id) => {
     if (!window.confirm('¿Eliminar pago?')) return
@@ -188,6 +206,7 @@ export default function GestionPagos() {
 
         <div style={styles.form}>
           <h3 style={styles.formTitle}>{editingId ? 'Editar Pago' : 'Agregar Pago'}</h3>
+          {pageError && <div style={styles.formError}>{pageError}</div>}
           <input style={styles.input} placeholder="Concepto" value={form.concepto}
             onChange={e => setForm({ ...form, concepto: e.target.value })} />
           <input style={styles.input} placeholder="Monto" type="number" value={form.monto}
@@ -300,6 +319,10 @@ const styles = {
   },
   form: { background: '#fff', borderRadius: 10, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' },
   formTitle: { fontSize: 15, fontWeight: 600, marginBottom: 10 },
+  formError: {
+    background: '#ffebee', color: '#c62828', padding: '8px 12px',
+    borderRadius: 6, fontSize: 13, marginBottom: 10,
+  },
   input: {
     padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd',
     fontSize: 14, outline: 'none', marginBottom: 8, width: '100%', boxSizing: 'border-box',
