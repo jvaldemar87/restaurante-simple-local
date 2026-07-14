@@ -167,6 +167,24 @@ export const reportes = {
   ventas: (fechaInicio, fechaFin) => api.get('/reportes/ventas', { params: { fechaInicio, fechaFin }, responseType: 'blob' }).then(r => r.data),
   insumos: (categoria) => api.get('/reportes/insumos', { params: { categoria }, responseType: 'blob' }).then(r => r.data),
   pagos: (categoria) => api.get('/reportes/pagos', { params: { categoria }, responseType: 'blob' }).then(r => r.data),
+  platillosPorHora: (fecha, top = 10, horaInicio = 0, horaFin = 23, categoria) => {
+    const params = { fecha, top, horaInicio, horaFin }
+    if (categoria) params.categoria = categoria
+    return api.get('/reportes/platillos-por-hora', { params, responseType: 'blob' }).then(r => r.data)
+  },
+  kpis: (fecha, categoria) => {
+    const params = { fecha }
+    if (categoria) params.categoria = categoria
+    return api.get('/reportes/kpis', { params, responseType: 'blob' }).then(r => r.data)
+  },
+  horasPico: (fechaInicio, fechaFin) => api.get('/reportes/horas-pico', { params: { fechaInicio, fechaFin }, responseType: 'blob' }).then(r => r.data),
+  ticketPromedio: (fechaInicio, fechaFin) => api.get('/reportes/ticket-promedio', { params: { fechaInicio, fechaFin }, responseType: 'blob' }).then(r => r.data),
+  tendenciaMensual: (anio) => api.get('/reportes/tendencia-mensual', { params: { anio }, responseType: 'blob' }).then(r => r.data),
+  estacionalidad: (anio, top = 10, vista = 'mensual', horaInicio = 0, horaFin = 23, categoria) => {
+    const params = { anio, top, vista, horaInicio, horaFin }
+    if (categoria) params.categoria = categoria
+    return api.get('/reportes/estacionalidad', { params, responseType: 'blob' }).then(r => r.data)
+  },
 }
 
 export default api

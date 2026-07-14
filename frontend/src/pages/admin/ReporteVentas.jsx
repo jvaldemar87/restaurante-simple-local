@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../../components/Header'
-import { categoriasInsumo, categoriasPago, openPdf } from '../../api/client'
+import { categoriasInsumo, categoriasPago, openPdf, reportes, categorias } from '../../api/client'
 
 const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
                'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
@@ -23,9 +23,24 @@ export default function ReporteVentas() {
   const [reportCatPagos, setReportCatPagos] = useState('')
   const [reportMesPagos, setReportMesPagos] = useState('')
   const [reportAnioPagos, setReportAnioPagos] = useState('')
+  const [fechaPlatillos, setFechaPlatillos] = useState(hoy)
+  const [topPlatillos, setTopPlatillos] = useState(10)
+  const [anioTendencia, setAnioTendencia] = useState(Number(hoy.split('-')[0]))
+  const [anioEstacionalidad, setAnioEstacionalidad] = useState(Number(hoy.split('-')[0]))
+  const [topEstacionalidad, setTopEstacionalidad] = useState(10)
+  const [vistaEstacionalidad, setVistaEstacionalidad] = useState('mensual')
+  const [horaInicioPlatillos, setHoraInicioPlatillos] = useState(0)
+  const [horaFinPlatillos, setHoraFinPlatillos] = useState(23)
+  const [horaInicioEstacionalidad, setHoraInicioEstacionalidad] = useState(0)
+  const [horaFinEstacionalidad, setHoraFinEstacionalidad] = useState(23)
+  const [catsMenu, setCatsMenu] = useState([])
+  const [catKPIs, setCatKPIs] = useState('')
+  const [catPlatillos, setCatPlatillos] = useState('')
+  const [catEstacionalidad, setCatEstacionalidad] = useState('')
 
   useEffect(() => { categoriasInsumo.list().then(setCatsInsumos) }, [])
   useEffect(() => { categoriasPago.list().then(setCatsPagos) }, [])
+  useEffect(() => { categorias.list().then(setCatsMenu) }, [])
 
   const generarVentas = async () => {
     setError(null)
@@ -57,6 +72,15 @@ export default function ReporteVentas() {
     }
   }
 
+  const generarPlatillosPorHora = async () => {
+    setError(null)
+    try {
+      await openPdf(`/api/reportes/platillos-por-hora?fecha=${fechaPlatillos}&top=${topPlatillos}`)
+    } catch (e) {
+      setError(e.message)
+    }
+  }
+
   const generarPagos = async () => {
     setError(null)
     try {
@@ -76,6 +100,132 @@ export default function ReporteVentas() {
         <div style={styles.topRow}>
           <button style={styles.backBtn} onClick={() => navigate('/admin')}>&lt;</button>
           <h2 style={styles.title}>Reportes</h2>
+        </div>
+
+        <div style={{ ...styles.card, background: '#eafaf1' }}>
+          <h3 style={styles.cardTitle}>Dashboard KPIs</h3>
+          <div style={styles.row}>
+            <label style={styles.label}>Fecha</label>
+            <input type="date" style={styles.input} value={fechaInicio}
+              onChange={e => { setFechaInicio(e.target.value); setFechaFin(e.target.value) }} />
+          </div>
+          <button style={{ ...styles.btn, background: '#1abc9c' }} onClick={async () => {
+            setError(null)
+            const p = catKPIs ? `fecha=${fechaInicio}&categoria=${catKPIs}` : `fecha=${fechaInicio}`
+            try { await openPdf(`/api/reportes/kpis?${p}`) }
+            catch (e) { setError(e.message) }
+          }}>Generar PDF</button>
+          <div style={{ ...styles.row, marginBottom: 0, marginTop: 10 }}>
+            <label style={styles.label}>Categoría</label>
+            <select style={styles.input} value={catKPIs} onChange={e => setCatKPIs(e.target.value)}>
+              <option value="">Todas las categorías</option>
+              {catsMenu.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div style={{ ...styles.card, background: '#fdeff2' }}>
+          <h3 style={styles.cardTitle}>Horas pico y tráfico</h3>
+          <div style={styles.row}>
+            <label style={styles.label}>Desde</label>
+            <input type="date" style={styles.input} value={fechaInicio}
+              onChange={e => setFechaInicio(e.target.value)} />
+          </div>
+          <div style={styles.row}>
+            <label style={styles.label}>Hasta</label>
+            <input type="date" style={styles.input} value={fechaFin}
+              onChange={e => setFechaFin(e.target.value)} />
+          </div>
+          <button style={{ ...styles.btn, background: '#c0392b' }} onClick={async () => {
+            setError(null)
+            try { await openPdf(`/api/reportes/horas-pico?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`) }
+            catch (e) { setError(e.message) }
+          }}>Generar PDF</button>
+        </div>
+
+        <div style={{ ...styles.card, background: '#e8f0fe' }}>
+          <h3 style={styles.cardTitle}>Ticket promedio</h3>
+          <div style={styles.row}>
+            <label style={styles.label}>Desde</label>
+            <input type="date" style={styles.input} value={fechaInicio}
+              onChange={e => setFechaInicio(e.target.value)} />
+          </div>
+          <div style={styles.row}>
+            <label style={styles.label}>Hasta</label>
+            <input type="date" style={styles.input} value={fechaFin}
+              onChange={e => setFechaFin(e.target.value)} />
+          </div>
+          <button style={{ ...styles.btn, background: '#2980b9' }} onClick={async () => {
+            setError(null)
+            try { await openPdf(`/api/reportes/ticket-promedio?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`) }
+            catch (e) { setError(e.message) }
+          }}>Generar PDF</button>
+        </div>
+
+        <div style={{ ...styles.card, background: '#fce4ec' }}>
+          <h3 style={styles.cardTitle}>Tendencia mensual</h3>
+          <div style={styles.row}>
+            <label style={styles.label}>Año</label>
+            <select style={{ ...styles.input, flex: 'none', width: 120 }} value={anioTendencia}
+              onChange={e => setAnioTendencia(Number(e.target.value))}>
+              {Array.from({ length: 5 }, (_, i) => hoy.split('-')[0] - 2 + i).map(a => (
+                <option key={a} value={a}>{a}</option>
+              ))}
+            </select>
+          </div>
+          <button style={{ ...styles.btn, background: '#d63384' }} onClick={async () => {
+            setError(null)
+            try { await openPdf(`/api/reportes/tendencia-mensual?anio=${anioTendencia}`) }
+            catch (e) { setError(e.message) }
+          }}>Generar PDF</button>
+        </div>
+
+        <div style={{ ...styles.card, background: '#ede7f6' }}>
+          <h3 style={styles.cardTitle}>Estacionalidad de platillos</h3>
+          <div style={styles.row}>
+            <label style={styles.label}>Año</label>
+            <select style={{ ...styles.input, flex: 'none', width: 120 }} value={anioEstacionalidad}
+              onChange={e => setAnioEstacionalidad(Number(e.target.value))}>
+              {Array.from({ length: 5 }, (_, i) => Number(hoy.split('-')[0]) - 2 + i).map(a => (
+                <option key={a} value={a}>{a}</option>
+              ))}
+            </select>
+          </div>
+          <div style={styles.row}>
+            <label style={styles.label}>Vista</label>
+            <select style={{ ...styles.input, flex: 'none', width: 140 }} value={vistaEstacionalidad}
+              onChange={e => setVistaEstacionalidad(e.target.value)}>
+              <option value="mensual">Mensual</option>
+              <option value="semanal">Semanal</option>
+            </select>
+          </div>
+          <div style={styles.row}>
+            <label style={styles.label}>Top</label>
+            <input type="number" min={1} max={50} style={{ ...styles.input, width: 80, flex: 'none' }}
+              value={topEstacionalidad} onChange={e => setTopEstacionalidad(Number(e.target.value))} />
+          </div>
+          <button style={{ ...styles.btn, background: '#7c4dff' }} onClick={async () => {
+            setError(null)
+            let p = `anio=${anioEstacionalidad}&top=${topEstacionalidad}&vista=${vistaEstacionalidad}&horaInicio=${horaInicioEstacionalidad}&horaFin=${horaFinEstacionalidad}`
+            if (catEstacionalidad) p += `&categoria=${catEstacionalidad}`
+            try { await openPdf(`/api/reportes/estacionalidad?${p}`) }
+            catch (e) { setError(e.message) }
+          }}>Generar PDF</button>
+          <div style={{ ...styles.row, marginBottom: 0, marginTop: 10, gap: 6 }}>
+            <label style={{ ...styles.label, width: 30 }}>De</label>
+            <input type="number" min={0} max={23} style={{ ...styles.input, width: 50, flex: 'none' }}
+              value={horaInicioEstacionalidad} onChange={e => setHoraInicioEstacionalidad(Number(e.target.value))} />
+            <label style={{ ...styles.label, width: 25 }}>a</label>
+            <input type="number" min={0} max={23} style={{ ...styles.input, width: 50, flex: 'none' }}
+              value={horaFinEstacionalidad} onChange={e => setHoraFinEstacionalidad(Number(e.target.value))} />
+          </div>
+          <div style={{ ...styles.row, marginBottom: 0 }}>
+            <label style={styles.label}>Categoría</label>
+            <select style={styles.input} value={catEstacionalidad} onChange={e => setCatEstacionalidad(e.target.value)}>
+              <option value="">Todas las categorías</option>
+              {catsMenu.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+            </select>
+          </div>
         </div>
 
         <div style={styles.card}>
@@ -133,6 +283,42 @@ export default function ReporteVentas() {
             <button style={styles.reportBtnPagos} onClick={generarPagos}>PDF</button>
           </div>
         </div>
+        <div style={{ ...styles.card, background: '#fff3e0' }}>
+          <h3 style={styles.cardTitle}>Platillos más vendidos por hora</h3>
+          <div style={styles.row}>
+            <label style={styles.label}>Fecha</label>
+            <input type="date" style={styles.input} value={fechaPlatillos}
+              onChange={e => setFechaPlatillos(e.target.value)} />
+          </div>
+          <div style={styles.row}>
+            <label style={styles.label}>Top</label>
+            <input type="number" min={1} max={50} style={{ ...styles.input, width: 80, flex: 'none' }}
+              value={topPlatillos} onChange={e => setTopPlatillos(Number(e.target.value))} />
+          </div>
+          <button style={{ ...styles.btn, background: '#e67e22' }} onClick={async () => {
+            setError(null)
+            let p = `fecha=${fechaPlatillos}&top=${topPlatillos}&horaInicio=${horaInicioPlatillos}&horaFin=${horaFinPlatillos}`
+            if (catPlatillos) p += `&categoria=${catPlatillos}`
+            try { await openPdf(`/api/reportes/platillos-por-hora?${p}`) }
+            catch (e) { setError(e.message) }
+          }}>Generar PDF</button>
+          <div style={{ ...styles.row, marginBottom: 0, marginTop: 10, gap: 6 }}>
+            <label style={{ ...styles.label, width: 30 }}>De</label>
+            <input type="number" min={0} max={23} style={{ ...styles.input, width: 50, flex: 'none' }}
+              value={horaInicioPlatillos} onChange={e => setHoraInicioPlatillos(Number(e.target.value))} />
+            <label style={{ ...styles.label, width: 25 }}>a</label>
+            <input type="number" min={0} max={23} style={{ ...styles.input, width: 50, flex: 'none' }}
+              value={horaFinPlatillos} onChange={e => setHoraFinPlatillos(Number(e.target.value))} />
+          </div>
+          <div style={{ ...styles.row, marginBottom: 0 }}>
+            <label style={styles.label}>Categoría</label>
+            <select style={styles.input} value={catPlatillos} onChange={e => setCatPlatillos(e.target.value)}>
+              <option value="">Todas las categorías</option>
+              {catsMenu.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+            </select>
+          </div>
+        </div>
+
         {error && <div style={styles.error}>{error}</div>}
       </div>
     </div>

@@ -33,4 +33,22 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     @Query("SELECT DISTINCT p FROM Pedido p JOIN FETCH p.detalles d JOIN FETCH d.producto JOIN FETCH p.mesa WHERE p.estado = 'COMIENDO' AND p.entregado = false ORDER BY p.fechaComanda ASC")
     List<Pedido> findByEstadoAndEntregadoFalseOrderByFechaComandaAsc();
+
+    @Query("SELECT DISTINCT p FROM Pedido p JOIN FETCH p.detalles d JOIN FETCH d.producto pr JOIN FETCH pr.categoria WHERE p.estado = 'CERRADO' AND p.fecha >= :inicio AND p.fecha <= :fin ORDER BY p.fecha ASC")
+    List<Pedido> findCerradosConProductosEntreFechas(@Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
+
+    @Query("SELECT DISTINCT p FROM Pedido p JOIN FETCH p.detalles d JOIN FETCH d.producto pr JOIN FETCH pr.categoria WHERE p.estado = 'CERRADO' AND p.fecha >= :inicio AND p.fecha <= :fin AND (:categoriaId IS NULL OR pr.categoria.id = :categoriaId) ORDER BY p.fecha ASC")
+    List<Pedido> findCerradosConProductosYCategoriaEntreFechas(@Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin, @Param("categoriaId") Long categoriaId);
+
+    @Query("SELECT COALESCE(SUM(p.total), 0) FROM Pedido p WHERE p.estado = 'CERRADO' AND p.fecha BETWEEN :inicio AND :fin")
+    Double sumTotalBetweenFechas(@Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
+
+    @Query("SELECT COUNT(p) FROM Pedido p WHERE p.estado = 'CERRADO' AND p.fecha BETWEEN :inicio AND :fin")
+    Long countPedidosBetweenFechas(@Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
+
+    @Query("SELECT p.fecha FROM Pedido p WHERE p.estado = 'CERRADO' AND p.fecha BETWEEN :inicio AND :fin ORDER BY p.fecha ASC")
+    List<LocalDateTime> findFechasCerradasEntre(@Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
+
+    @Query("SELECT p.fecha, p.total FROM Pedido p WHERE p.estado = 'CERRADO' AND p.fecha BETWEEN :inicio AND :fin")
+    List<Object[]> findFechasYTotalesEntre(@Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
 }

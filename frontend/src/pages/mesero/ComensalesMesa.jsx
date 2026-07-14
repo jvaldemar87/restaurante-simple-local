@@ -9,6 +9,13 @@ export default function ComensalesMesa() {
   const [lista, setLista] = useState([])
   const [mesa, setMesa] = useState(null)
   const [newName, setNewName] = useState('')
+  const [contador, setContador] = useState(1)
+
+  const validarNombre = (nombre) => {
+    const trimmed = nombre.trim()
+    const matches = trimmed.match(/[\p{L}\p{N}]/gu) || []
+    return matches.length >= 3 ? trimmed : null
+  }
 
   const load = async () => {
     const [c, m] = await Promise.all([
@@ -22,8 +29,9 @@ export default function ComensalesMesa() {
   useEffect(() => { load() }, [mesaId])
 
   const addComensal = async () => {
-    if (!newName.trim()) return
-    await comensales.create({ nombre: newName.trim(), mesaId: Number(mesaId) })
+    const nombre = validarNombre(newName) ?? `comensal ${contador}`
+    if (!validarNombre(newName)) setContador(c => c + 1)
+    await comensales.create({ nombre, mesaId: Number(mesaId) })
     setNewName('')
     load()
   }
@@ -54,6 +62,7 @@ export default function ComensalesMesa() {
       const blob = await res.blob()
       pdfWindow.location.href = URL.createObjectURL(blob)
       await pedidos.cerrarMesa(mesaId)
+      setContador(1)
       await load()
     } catch (e) {
       pdfWindow.close()
