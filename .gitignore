@@ -1,2 +1,4 @@
 restaurante_documentos/
 respaldos/
+*.dockerignore
+*.env

@@ -1,5 +1,6 @@
 package com.restaurante.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -13,6 +14,9 @@ import java.io.IOException;
 
 @Configuration
 public class WebConfig {
+
+    @Value("${app.upload.dir}")
+    private String uploadDir;
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
@@ -29,7 +33,7 @@ public class WebConfig {
             @Override
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
                 registry.addResourceHandler("/uploads/**")
-                        .addResourceLocations("file:./uploads/");
+                        .addResourceLocations("file:" + uploadDir + "/");
 
                 registry.addResourceHandler("/**")
                         .addResourceLocations("classpath:/static/")

@@ -1,0 +1,25 @@
+services:
+  restaurante-app:
+    build: .
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    volumes:
+      - ./docker-data/db:/app/data
+      - ./docker-data/uploads:/app/uploads
+      - ./docker-data/respaldos:/app/respaldos
+    environment:
+      - TZ=America/Mexico_City
+    networks:
+      - web_app_restaurante
+  cloudflared-restaurante:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    restart: unless-stopped
+    networks:
+      - web_app_restaurante
+
+networks:
+  web_app_restaurante:
+    driver: bridge

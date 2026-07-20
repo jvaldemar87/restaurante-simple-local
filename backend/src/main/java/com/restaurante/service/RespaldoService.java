@@ -15,24 +15,36 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class RespaldoService {
 
-    private static final String DB_FILE = "restaurante.db";
     private static final String UPLOADS_DIR = "uploads";
-    private static final String BACKUPS_DIR = "respaldos";
+
+    @Value("${spring.datasource.url}")
+    private String datasourceUrl;
 
     @Value("${app.upload.dir:./uploads}")
     private String uploadDirPath;
 
+    @Value("${app.backup.dir}")
+    private String backupsDir;
+
+    private String getDbFilePath() {
+        return datasourceUrl.replace("jdbc:sqlite:", "");
+    }
+
+    private String getDbFileName() {
+        return Paths.get(getDbFilePath()).getFileName().toString();
+    }
+
     public Path exportar(boolean incluirImagenes) throws IOException {
-        Path exportDir = Paths.get(BACKUPS_DIR);
+        Path exportDir = Paths.get(backupsDir);
         Files.createDirectories(exportDir);
 
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmm"));
         Path zipPath = exportDir.resolve("respaldo_" + timestamp + ".zip");
 
         try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipPath.toFile()))) {
-            Path dbPath = Paths.get(DB_FILE);
+            Path dbPath = Paths.get(getDbFilePath());
             if (Files.exists(dbPath)) {
-                ZipEntry entry = new ZipEntry(DB_FILE);
+                ZipEntry entry = new ZipEntry(getDbFileName());
                 zos.putNextEntry(entry);
                 Files.copy(dbPath, zos);
                 zos.closeEntry();
@@ -83,7 +95,7 @@ public class RespaldoService {
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(tempDir)) {
                 for (Path p : stream) {
                     String name = p.getFileName().toString();
-                    if (name.endsWith(".db") || name.equalsIgnoreCase(DB_FILE)) {
+                    if (name.endsWith(".db") || name.equalsIgnoreCase(getDbFileName())) {
                         importedDb = p;
                         break;
                     }
@@ -100,7 +112,7 @@ public class RespaldoService {
 
             respaldarActual();
 
-            Files.copy(importedDb, Paths.get(DB_FILE), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(importedDb, Paths.get(getDbFilePath()), StandardCopyOption.REPLACE_EXISTING);
 
             if (Files.exists(importedUploads) && Files.isDirectory(importedUploads)) {
                 Path uploadsDest = Paths.get(uploadDirPath);
@@ -144,10 +156,10 @@ public class RespaldoService {
     }
 
     private void respaldarActual() throws IOException {
-        Path dbPath = Paths.get(DB_FILE);
+        Path dbPath = Paths.get(getDbFilePath());
         if (!Files.exists(dbPath)) return;
 
-        Path backupDir = Paths.get(BACKUPS_DIR);
+        Path backupDir = Paths.get(backupsDir);
         Files.createDirectories(backupDir);
 
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"));

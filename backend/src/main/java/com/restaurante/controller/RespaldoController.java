@@ -13,11 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
@@ -86,29 +84,9 @@ public class RespaldoController {
 
     private void reiniciarAplicacion() {
         try {
-            Path jarPath = Paths.get("target", "restaurante-backend-1.0.0.jar").toAbsolutePath();
-
-            if (!Files.exists(jarPath)) {
-                applicationContext.close();
-                return;
-            }
-
-            ProcessBuilder pb = new ProcessBuilder(
-                    "java", "-jar", jarPath.toString(),
-                    "--server.port=8080"
-            );
-            pb.directory(new File(System.getProperty("user.dir")));
-            pb.inheritIO();
-
-            Process nuevoProceso = pb.start();
-
-            Thread.sleep(3000);
-
-            if (nuevoProceso.isAlive()) {
-                applicationContext.close();
-            }
-        } catch (Exception e) {
-            applicationContext.close();
+            Thread.sleep(2000);
+        } catch (InterruptedException ignored) {
         }
+        applicationContext.close();
     }
 }
