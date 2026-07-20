@@ -18,13 +18,16 @@ public class WebConfig {
     @Value("${app.upload.dir}")
     private String uploadDir;
 
+    @Value("${app.cors.allowed-origins}")
+    private String[] corsAllowedOrigins;
+
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("http://localhost:3000")
+                        .allowedOrigins(corsAllowedOrigins)
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);

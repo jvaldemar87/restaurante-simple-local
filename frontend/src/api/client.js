@@ -10,6 +10,7 @@ api.interceptors.request.use(config => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+  console.log(`>>> [AXIOS] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`, config.data || '')
   return config
 })
 
