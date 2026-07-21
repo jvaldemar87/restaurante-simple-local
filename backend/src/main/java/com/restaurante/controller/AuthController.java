@@ -5,8 +5,6 @@ import com.restaurante.dto.LoginResponse;
 import com.restaurante.model.Usuario;
 import com.restaurante.repository.UsuarioRepository;
 import com.restaurante.security.JwtUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,8 +17,6 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-
-    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
@@ -35,23 +31,14 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        log.info(">>> [LOGIN] Intento de login - usuario: '{}'", request.getUsername());
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+        );
 
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-            );
+        Usuario usuario = usuarioRepository.findByUsername(request.getUsername()).orElseThrow();
+        String token = jwtUtil.generateToken(usuario.getUsername(), usuario.getRol(), usuario.getNombre());
 
-            Usuario usuario = usuarioRepository.findByUsername(request.getUsername()).orElseThrow();
-            String token = jwtUtil.generateToken(usuario.getUsername(), usuario.getRol(), usuario.getNombre());
-
-            log.info(">>> [LOGIN] EXITOSO - usuario: '{}', rol: '{}'", usuario.getUsername(), usuario.getRol());
-            return ResponseEntity.ok(new LoginResponse(token, usuario.getRol(), usuario.getNombre()));
-
-        } catch (Exception e) {
-            log.error(">>> [LOGIN] FALLIDO - usuario: '{}', error: {}", request.getUsername(), e.getMessage());
-            throw e;
-        }
+        return ResponseEntity.ok(new LoginResponse(token, usuario.getRol(), usuario.getNombre()));
     }
 
     @GetMapping("/me")

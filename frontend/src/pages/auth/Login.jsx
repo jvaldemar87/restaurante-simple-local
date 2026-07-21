@@ -17,15 +17,7 @@ export default function Login() {
       const rol = JSON.parse(localStorage.getItem('user')).rol
       const path = `/${rol.toLowerCase()}`
       navigate(path, { replace: true })
-    } catch (err) {
-      console.error('>>> [LOGIN-FRONTEND] Error en login:', err)
-      if (err.response) {
-        console.error('>>> [LOGIN-FRONTEND] Status:', err.response.status, 'Data:', err.response.data)
-      } else if (err.request) {
-        console.error('>>> [LOGIN-FRONTEND] No se recibio respuesta del servidor (error de red)')
-      } else {
-        console.error('>>> [LOGIN-FRONTEND] Error al configurar la peticion:', err.message)
-      }
+    } catch {
       setError('Usuario o contraseña incorrectos')
     }
   }

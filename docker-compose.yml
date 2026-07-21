@@ -10,16 +10,5 @@ services:
       - ./docker-data/respaldos:/app/respaldos
     environment:
       - TZ=America/Mexico_City
-    networks:
-      - web_app_restaurante
-  cloudflared-restaurante:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflared
-    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
-    restart: unless-stopped
-    networks:
-      - web_app_restaurante
-
-networks:
-  web_app_restaurante:
-    driver: bridge
+      - CORS_ORIGINS=*
+      - JWT_SECRET=cambia-esta-clave-por-una-secreta
